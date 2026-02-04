@@ -1,50 +1,65 @@
-﻿<view class="container">
-  <view class="card">
-    <view class="section-title">当前习惯</view>
-    <picker
-      class="picker"
-      mode="selector"
-      range="{{habitNames}}"
-      value="{{habitIndex}}"
-      bindchange="onHabitChange"
-    >
-      <view class="row">
-        <text class="picker-text">{{habitNames[habitIndex] || '请选择习惯'}}</text>
-        <text class="tag">切换</text>
+<view class="home-page">
+  <view class="home-header">
+    <button class="btn-create" bindtap="onOpenCreate">新建习惯</button>
+
+    <view class="decor-pill"></view>
+
+    <view class="bubble-area">
+      <view class="bubble-shell">
+        <picker
+          class="habit-picker"
+          mode="selector"
+          range="{{pickerHabitNames}}"
+          value="{{activeHabitIndex}}"
+          bindchange="onHabitChange"
+          disabled="{{activeHabits.length === 0}}"
+        >
+          <view class="habit-bubble">
+            <text class="bubble-label">当前习惯</text>
+            <text class="bubble-name">{{currentHabitName}}</text>
+            <text class="bubble-tip">{{bubbleTip}}</text>
+          </view>
+        </picker>
+        <view class="bubble-tail"></view>
       </view>
-    </picker>
-    <view wx:if="{{habits.length === 0}}" class="empty muted">
-      还没有习惯
+      <button class="btn-manage" bindtap="onToggleManage">管理</button>
     </view>
-    <button class="btn-primary" bindtap="onOpenCreate">新建习惯</button>
   </view>
 
-  <view class="card" wx:if="{{habits.length > 0}}">
-    <view class="section-title">今日打卡</view>
-    <input
-      class="input"
-      placeholder="可选：打卡备注"
-      value="{{note}}"
-      bindinput="onNoteInput"
-    />
-    <view style="height: 16rpx"></view>
-    <button
-      class="{{todayChecked ? 'btn-disabled' : 'btn-primary'}}"
-      disabled="{{todayChecked || loadingToday}}"
-      bindtap="onCheckin"
-    >
-      {{todayChecked ? '今日已打卡' : (loadingToday ? '处理中...' : '今日打卡')}}
-    </button>
+  <view class="home-main">
+    <view class="checkin-wrap">
+      <view class="checkin-ring"></view>
+      <button
+        class="checkin-btn {{todayChecked ? 'is-checked' : ''}} {{!currentHabitId ? 'is-empty' : ''}}"
+        bindtap="onCheckinTap"
+        disabled="{{loadingToday}}"
+      >
+        <text class="checkin-text" wx:if="{{loadingToday}}">处理中...</text>
+        <text class="checkin-text" wx:elif="{{!currentHabitId}}">创建习惯</text>
+        <text class="checkin-text" wx:elif="{{todayChecked}}">已打卡</text>
+        <text class="checkin-text" wx:else>打卡</text>
+
+        <text class="checkin-sub" wx:if="{{!currentHabitId}}">先创建一个习惯</text>
+        <text class="checkin-sub" wx:elif="{{todayChecked}}">今天已完成</text>
+        <text class="checkin-sub" wx:elif="{{loadingToday}}">请稍候</text>
+        <text class="checkin-sub" wx:else>点一下完成今天</text>
+      </button>
+    </view>
   </view>
 
-  <view class="card">
-    <view class="section-title">习惯列表</view>
-    <view
-      class="row habit-item"
-      wx:for="{{habits}}"
-      wx:key="id"
-    >
-      <text>{{item.title}}</text>
+  <view class="footer-hint">
+    <text class="muted">只展示已启用习惯，可在管理中切换启用状态</text>
+  </view>
+</view>
+
+<view wx:if="{{showManage}}" class="modal-mask" bindtap="onToggleManage">
+  <view class="manage-modal" catchtap="onStopTap">
+    <view class="manage-header">
+      <text class="manage-title">习惯管理</text>
+      <button class="btn-ghost btn-manage-close" bindtap="onToggleManage">关闭</button>
+    </view>
+    <view class="manage-item" wx:for="{{habits}}" wx:key="id">
+      <text class="manage-name">{{item.title}}</text>
       <switch
         checked="{{item.is_active}}"
         data-id="{{item.id}}"
@@ -52,9 +67,7 @@
         bindchange="onToggleHabit"
       />
     </view>
-    <view wx:if="{{habits.length === 0}}" class="muted">
-      暂无习惯，请先创建。
-    </view>
+    <view wx:if="{{habits.length === 0}}" class="muted">暂无习惯</view>
   </view>
 </view>
 
@@ -70,6 +83,22 @@
     <view class="modal-actions">
       <button class="btn-ghost" bindtap="onCloseCreate">取消</button>
       <button class="btn-primary" bindtap="onCreateHabit">创建</button>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showNoteModal}}" class="modal-mask" bindtap="onCloseNote">
+  <view class="modal" catchtap="onStopTap">
+    <view class="section-title">打卡备注（可选）</view>
+    <input
+      class="input"
+      placeholder="写点什么..."
+      value="{{noteInput}}"
+      bindinput="onNoteInput"
+    />
+    <view class="modal-actions">
+      <button class="btn-ghost" bindtap="onCloseNote">取消</button>
+      <button class="btn-primary" bindtap="onConfirmNote">提交打卡</button>
     </view>
   </view>
 </view>

@@ -1,4 +1,4 @@
-﻿const api = require('../../api/index');
+const api = require('../../api/index');
 const store = require('../../utils/store');
 
 function normalizeHabits(res) {
@@ -24,17 +24,63 @@ function parseTodayChecked(res) {
   return false;
 }
 
+function buildActiveState(habits, storedId) {
+  const activeHabits = habits.filter((item) => item.is_active !== false);
+  const activeHabitNames = activeHabits.map((item) => item.title);
+  let activeHabitIndex = 0;
+  let currentHabitId = null;
+
+  if (activeHabits.length > 0) {
+    if (storedId) {
+      const foundIndex = activeHabits.findIndex((item) => `${item.id}` === `${storedId}`);
+      if (foundIndex >= 0) {
+        activeHabitIndex = foundIndex;
+      }
+    }
+    currentHabitId = activeHabits[activeHabitIndex].id;
+  }
+
+  const hasHabits = habits.length > 0;
+  let currentHabitName = '请先创建习惯';
+  let bubbleTip = '点左上角新建';
+  if (activeHabits.length > 0) {
+    currentHabitName = activeHabits[activeHabitIndex].title;
+    bubbleTip = '点击切换';
+  } else if (hasHabits) {
+    currentHabitName = '请先启用习惯';
+    bubbleTip = '在管理中启用';
+  }
+
+  const pickerHabitNames = activeHabitNames.length > 0 ? activeHabitNames : [''];
+
+  return {
+    activeHabits,
+    activeHabitNames,
+    activeHabitIndex,
+    currentHabitId,
+    currentHabitName,
+    bubbleTip,
+    pickerHabitNames
+  };
+}
+
 Page({
   data: {
     habits: [],
-    habitNames: [],
-    habitIndex: 0,
+    activeHabits: [],
+    activeHabitNames: [],
+    activeHabitIndex: 0,
     currentHabitId: null,
+    currentHabitName: '请先创建习惯',
+    bubbleTip: '点左上角新建',
+    pickerHabitNames: [''],
     todayChecked: false,
     loadingToday: false,
-    note: '',
     showCreateModal: false,
-    newHabitTitle: ''
+    newHabitTitle: '',
+    showNoteModal: false,
+    noteInput: '',
+    showManage: false
   },
   onShow() {
     this.loadHabits();
@@ -44,39 +90,31 @@ Page({
       .list()
       .then((res) => {
         const habits = normalizeHabits(res);
-        const habitNames = habits.map((item) => item.title);
-        const storedId = store.getCurrentHabitId();
-        let habitIndex = 0;
-        let currentHabitId = null;
-
-        if (habits.length > 0) {
-          if (storedId) {
-            const foundIndex = habits.findIndex((item) => `${item.id}` === `${storedId}`);
-            if (foundIndex >= 0) {
-              habitIndex = foundIndex;
-            }
-          }
-          currentHabitId = habits[habitIndex].id;
-          store.setCurrentHabitId(currentHabitId);
-        } else {
-          store.setCurrentHabitId(null);
-        }
-
-        this.setData({
-          habits,
-          habitNames,
-          habitIndex,
-          currentHabitId,
-          todayChecked: false
-        });
-
-        if (currentHabitId) {
-          this.fetchTodayStatus();
-        }
+        this.applyHabits(habits);
       })
       .catch(() => {
-        this.setData({ habits: [], habitNames: [], currentHabitId: null, todayChecked: false });
+        this.applyHabits([]);
       });
+  },
+  applyHabits(habits) {
+    const storedId = store.getCurrentHabitId();
+    const state = buildActiveState(habits, storedId);
+
+    if (state.currentHabitId) {
+      store.setCurrentHabitId(state.currentHabitId);
+    } else {
+      store.setCurrentHabitId(null);
+    }
+
+    this.setData({
+      habits,
+      ...state,
+      todayChecked: false
+    });
+
+    if (state.currentHabitId) {
+      this.fetchTodayStatus();
+    }
   },
   fetchTodayStatus() {
     const { currentHabitId } = this.data;
@@ -95,15 +133,39 @@ Page({
       });
   },
   onHabitChange(e) {
-    const habitIndex = Number(e.detail.value || 0);
-    const habit = this.data.habits[habitIndex];
+    const activeHabitIndex = Number(e.detail.value || 0);
+    const habit = this.data.activeHabits[activeHabitIndex];
+    const hasHabits = this.data.habits.length > 0;
     const currentHabitId = habit ? habit.id : null;
-    store.setCurrentHabitId(currentHabitId);
-    this.setData({ habitIndex, currentHabitId, todayChecked: false, note: '' });
+    const currentHabitName = habit
+      ? habit.title
+      : (hasHabits ? '请先启用习惯' : '请先创建习惯');
+    const bubbleTip = habit
+      ? '点击切换'
+      : (hasHabits ? '在管理中启用' : '点左上角新建');
+
+    if (currentHabitId) {
+      store.setCurrentHabitId(currentHabitId);
+    } else {
+      store.setCurrentHabitId(null);
+    }
+
+    this.setData({
+      activeHabitIndex,
+      currentHabitId,
+      currentHabitName,
+      bubbleTip,
+      todayChecked: false
+    });
+
     if (currentHabitId) {
       this.fetchTodayStatus();
     }
   },
+  onToggleManage() {
+    this.setData({ showManage: !this.data.showManage });
+  },
+  onStopTap() {},
   onToggleHabit(e) {
     const habitId = e.currentTarget.dataset.id;
     const index = e.currentTarget.dataset.index;
@@ -116,10 +178,9 @@ Page({
         if (habits[index]) {
           habits[index].is_active = isActive;
         }
-        this.setData({ habits });
+        this.applyHabits(habits);
       })
       .catch(() => {
-        // revert UI if failed
         const habits = this.data.habits.slice();
         if (habits[index]) {
           habits[index].is_active = !isActive;
@@ -127,19 +188,53 @@ Page({
         this.setData({ habits });
       });
   },
-  onNoteInput(e) {
-    this.setData({ note: e.detail.value });
+  onCheckinTap() {
+    const { currentHabitId, todayChecked, loadingToday, habits } = this.data;
+    if (loadingToday) return;
+
+    if (!currentHabitId) {
+      const hasHabits = habits.length > 0;
+      wx.showToast({ title: hasHabits ? '请先启用习惯' : '请先创建习惯', icon: 'none' });
+      if (hasHabits) {
+        this.setData({ showManage: true });
+      } else {
+        this.onOpenCreate();
+      }
+      return;
+    }
+
+    if (todayChecked) {
+      wx.showToast({ title: '今天已完成', icon: 'none' });
+      return;
+    }
+
+    this.setData({ showNoteModal: true, noteInput: '', showManage: false });
   },
-  onCheckin() {
-    const { currentHabitId, todayChecked, note, loadingToday } = this.data;
-    if (!currentHabitId || todayChecked || loadingToday) return;
+  onNoteInput(e) {
+    this.setData({ noteInput: e.detail.value });
+  },
+  onCloseNote() {
+    this.setData({ showNoteModal: false, noteInput: '' });
+  },
+  onConfirmNote() {
+    const note = (this.data.noteInput || '').trim();
+    this.setData({ showNoteModal: false });
+    this.doCheckin(note);
+  },
+  doCheckin(note) {
+    const { currentHabitId } = this.data;
+    if (!currentHabitId) return;
 
     this.setData({ loadingToday: true });
     api.checkins
       .checkin(currentHabitId, note)
       .then(() => {
         wx.showToast({ title: '打卡成功', icon: 'success' });
-        this.setData({ todayChecked: true, note: '' });
+        this.setData({ todayChecked: true, noteInput: '' });
+        return api.checkins.today(currentHabitId);
+      })
+      .then((res) => {
+        this.setData({ todayChecked: parseTodayChecked(res) });
       })
       .catch(() => {})
       .finally(() => {
@@ -147,7 +242,7 @@ Page({
       });
   },
   onOpenCreate() {
-    this.setData({ showCreateModal: true, newHabitTitle: '' });
+    this.setData({ showCreateModal: true, newHabitTitle: '', showManage: false });
   },
   onCloseCreate() {
     this.setData({ showCreateModal: false, newHabitTitle: '' });

@@ -1,18 +1,222 @@
-﻿.picker-text {
-  font-size: 30rpx;
-  font-weight: 600;
+.home-page {
+  min-height: 100vh;
+  padding: 24rpx 24rpx 48rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
 }
 
-.empty {
-  padding: 16rpx 0;
+.home-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.btn-create {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 16rpx;
+  padding: 12rpx 20rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.08);
+}
+
+.btn-create::after {
+  border: none;
+}
+
+.decor-pill {
+  position: absolute;
+  left: 50%;
+  top: 10rpx;
+  transform: translateX(-50%);
+  width: 72rpx;
+  height: 14rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.15), rgba(59, 130, 246, 0.35));
+}
+
+.bubble-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12rpx;
+}
+
+.bubble-shell {
+  position: relative;
+}
+
+.habit-bubble {
+  background: #ffffff;
+  padding: 18rpx 22rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 14rpx 30rpx rgba(15, 23, 42, 0.1);
+  min-width: 240rpx;
+  max-width: 320rpx;
+}
+
+.bubble-label {
+  font-size: 22rpx;
+  color: #94a3b8;
+}
+
+.bubble-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #0f172a;
+  margin-top: 6rpx;
+}
+
+.bubble-tip {
+  font-size: 22rpx;
+  color: #64748b;
+  margin-top: 6rpx;
+}
+
+.bubble-tail {
+  position: absolute;
+  left: -10rpx;
+  bottom: 18rpx;
+  width: 18rpx;
+  height: 18rpx;
+  background: #ffffff;
+  transform: rotate(45deg);
+  box-shadow: -6rpx 6rpx 16rpx rgba(15, 23, 42, 0.08);
+  border-radius: 4rpx;
+}
+
+.btn-manage {
+  background: #f1f5f9;
+  color: #334155;
+  border-radius: 999rpx;
+  padding: 8rpx 18rpx;
+  font-size: 22rpx;
+  box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.08);
+  border: 1rpx solid #e2e8f0;
+}
+
+.btn-manage::after {
+  border: none;
+}
+
+.home-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 10rpx;
+}
+
+.checkin-wrap {
+  position: relative;
+  width: 360rpx;
+  height: 360rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkin-ring {
+  position: absolute;
+  width: 320rpx;
+  height: 320rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, rgba(37, 99, 235, 0.22), rgba(37, 99, 235, 0) 70%);
+}
+
+.checkin-btn {
+  width: 260rpx;
+  height: 260rpx;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18rpx 40rpx rgba(37, 99, 235, 0.35);
+  border: none;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.checkin-btn::after {
+  border: none;
+}
+
+.checkin-btn.is-checked {
+  background: #cbd5e1;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.checkin-btn.is-empty {
+  background: #e2e8f0;
+  color: #334155;
+  box-shadow: 0 12rpx 28rpx rgba(15, 23, 42, 0.12);
+}
+
+.checkin-text {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.checkin-sub {
+  font-size: 22rpx;
+  margin-top: 10rpx;
+  opacity: 0.9;
+}
+
+.footer-hint {
   text-align: center;
 }
 
-.habit-item {
-  padding: 12rpx 0;
-  border-bottom: 1rpx solid #eef2f7;
+.manage-modal {
+  width: 640rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 24rpx;
 }
 
-.habit-item:last-child {
+.manage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.manage-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.btn-manage-close {
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
+}
+
+.btn-manage-close::after {
+  border: none;
+}
+
+.manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f1f5f9;
+}
+
+.manage-item:last-child {
   border-bottom: none;
+}
+
+.manage-name {
+  font-size: 28rpx;
+  color: #1f2937;
 }
