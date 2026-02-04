@@ -1,0 +1,25 @@
+﻿.picker-text {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #eef2f7;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: #64748b;
+}
+
+.stat-value {
+  font-size: 34rpx;
+  font-weight: 600;
+}

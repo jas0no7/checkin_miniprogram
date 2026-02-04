@@ -1,0 +1,8 @@
+﻿.picker-text {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.section-title {
+  margin-bottom: 0;
+}

@@ -1,0 +1,75 @@
+﻿<view class="container">
+  <view class="card">
+    <view class="section-title">当前习惯</view>
+    <picker
+      class="picker"
+      mode="selector"
+      range="{{habitNames}}"
+      value="{{habitIndex}}"
+      bindchange="onHabitChange"
+    >
+      <view class="row">
+        <text class="picker-text">{{habitNames[habitIndex] || '请选择习惯'}}</text>
+        <text class="tag">切换</text>
+      </view>
+    </picker>
+    <view wx:if="{{habits.length === 0}}" class="empty muted">
+      还没有习惯
+    </view>
+    <button class="btn-primary" bindtap="onOpenCreate">新建习惯</button>
+  </view>
+
+  <view class="card" wx:if="{{habits.length > 0}}">
+    <view class="section-title">今日打卡</view>
+    <input
+      class="input"
+      placeholder="可选：打卡备注"
+      value="{{note}}"
+      bindinput="onNoteInput"
+    />
+    <view style="height: 16rpx"></view>
+    <button
+      class="{{todayChecked ? 'btn-disabled' : 'btn-primary'}}"
+      disabled="{{todayChecked || loadingToday}}"
+      bindtap="onCheckin"
+    >
+      {{todayChecked ? '今日已打卡' : (loadingToday ? '处理中...' : '今日打卡')}}
+    </button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">习惯列表</view>
+    <view
+      class="row habit-item"
+      wx:for="{{habits}}"
+      wx:key="id"
+    >
+      <text>{{item.title}}</text>
+      <switch
+        checked="{{item.is_active}}"
+        data-id="{{item.id}}"
+        data-index="{{index}}"
+        bindchange="onToggleHabit"
+      />
+    </view>
+    <view wx:if="{{habits.length === 0}}" class="muted">
+      暂无习惯，请先创建。
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{showCreateModal}}" class="modal-mask">
+  <view class="modal">
+    <view class="section-title">新建习惯</view>
+    <input
+      class="input"
+      placeholder="请输入习惯标题"
+      value="{{newHabitTitle}}"
+      bindinput="onCreateInput"
+    />
+    <view class="modal-actions">
+      <button class="btn-ghost" bindtap="onCloseCreate">取消</button>
+      <button class="btn-primary" bindtap="onCreateHabit">创建</button>
+    </view>
+  </view>
+</view>

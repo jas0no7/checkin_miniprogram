@@ -1,0 +1,22 @@
+﻿<view class="container">
+  <view class="card">
+    <view class="section-title">后端地址</view>
+    <input
+      class="input"
+      placeholder="http://127.0.0.1:8000"
+      value="{{baseURL}}"
+      bindinput="onBaseURLInput"
+    />
+    <view style="height: 16rpx"></view>
+    <button class="btn-primary" bindtap="onSave">保存</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">健康检查</view>
+    <button class="btn-ghost" bindtap="onHealthCheck">健康检查</button>
+    <view style="height: 12rpx"></view>
+    <text class="hint">
+      本地调试真机请将 baseURL 改为电脑局域网 IP，例如 http://192.168.x.x:8000
+    </text>
+  </view>
+</view>

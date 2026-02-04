@@ -1,0 +1,33 @@
+﻿<view class="container">
+  <view class="card">
+    <view class="section-title">当前习惯</view>
+    <picker
+      class="picker"
+      mode="selector"
+      range="{{habitNames}}"
+      value="{{habitIndex}}"
+      bindchange="onHabitChange"
+    >
+      <view class="row">
+        <text class="picker-text">{{habitNames[habitIndex] || '请选择习惯'}}</text>
+        <text class="tag">切换</text>
+      </view>
+    </picker>
+    <view wx:if="{{habits.length === 0}}" class="muted">还没有习惯</view>
+  </view>
+
+  <view class="card">
+    <view class="stat-row">
+      <text class="stat-label">连续天数</text>
+      <text class="stat-value">{{stats.streak}}</text>
+    </view>
+    <view class="stat-row">
+      <text class="stat-label">累计天数</text>
+      <text class="stat-value">{{stats.total}}</text>
+    </view>
+    <view class="stat-row">
+      <text class="stat-label">最近打卡</text>
+      <text class="stat-value">{{stats.last_checkin_date}}</text>
+    </view>
+  </view>
+</view>

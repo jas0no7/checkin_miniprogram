@@ -1,0 +1,18 @@
+﻿.picker-text {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.empty {
+  padding: 16rpx 0;
+  text-align: center;
+}
+
+.habit-item {
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #eef2f7;
+}
+
+.habit-item:last-child {
+  border-bottom: none;
+}
